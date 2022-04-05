@@ -11,16 +11,19 @@ import {
   Put,
 } from '@nestjs/common';
 import { ApiParam, ApiTags } from '@nestjs/swagger';
+import { RedisService } from 'src/shared/services/redis.service';
 import { DeleteResult, UpdateResult } from 'typeorm';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { IUserEntity } from './user.entity';
 import { UserRepository } from './user.repository';
-
 @Controller('users')
 @ApiTags('user')
 export class UserController {
-  constructor(private userRepository: UserRepository) {}
+  constructor(
+    private userRepository: UserRepository,
+    private redisService: RedisService,
+  ) {}
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createUser(@Body() createUserDto: CreateUserDto) {
@@ -31,6 +34,9 @@ export class UserController {
   @HttpCode(HttpStatus.OK)
   @Get()
   async getUsers(): Promise<IUserEntity[]> {
+    const name = await this.redisService.get('name');
+    // console.log(name);
+    this.redisService.set('name', 'abcdef');
     const users = await this.userRepository.find();
     return users;
   }
