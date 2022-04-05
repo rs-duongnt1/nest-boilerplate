@@ -5,8 +5,8 @@ import { Cache } from 'cache-manager';
 export class RedisService {
   constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
 
-  get(key: string) {
-    return this.cacheManager.get(key);
+  get<T>(key: string) {
+    return this.cacheManager.get<T>(key);
   }
 
   set(key: string, value: any) {

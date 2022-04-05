@@ -18,6 +18,8 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
           host: configService.get('REDIS_HOST'),
           port: configService.get('REDIS_PORT'),
           ttl: configService.get('CACHE_TTL'),
+          auth_pass: configService.get('REDIS_PASS'),
+          max: 1,
         };
       },
     }),

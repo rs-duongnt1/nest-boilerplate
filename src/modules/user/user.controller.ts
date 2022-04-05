@@ -25,19 +25,26 @@ export class UserController {
     private redisService: RedisService,
   ) {}
   @Post()
-  @HttpCode(HttpStatus.CREATED)
+  @HttpCode(HttpStatus.OK)
   async createUser(@Body() createUserDto: CreateUserDto) {
     const user = this.userRepository.create(createUserDto);
-    this.userRepository.save(user);
+    const userResult = await this.userRepository.save(user);
+    const users: IUserEntity[] = await this.redisService.get<IUserEntity[]>(
+      '/api/users',
+    );
+    users.push(userResult);
+    this.redisService.set('/api/users', users);
+    return users;
   }
 
   @HttpCode(HttpStatus.OK)
   @Get()
   async getUsers(): Promise<IUserEntity[]> {
-    const name = await this.redisService.get('name');
-    // console.log(name);
-    this.redisService.set('name', 'abcdef');
-    const users = await this.userRepository.find();
+    const users = await this.userRepository.find({
+      order: {
+        createdAt: 1,
+      },
+    });
     return users;
   }
 
